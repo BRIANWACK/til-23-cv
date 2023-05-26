@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "til_23_cv"}]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "3.9.*"
 torch = "2.0.0"
 torchvision = "0.15.1"
 # transformers = "^4.29.2"
