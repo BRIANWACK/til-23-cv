@@ -5,19 +5,19 @@ task: detect  # YOLO task, i.e. detect, segment, classify, pose
 mode: train  # YOLO mode, i.e. train, val, predict, export, track, benchmark
 
 # Train settings -------------------------------------------------------------------------------------------------------
-model: yolov5x6u.pt  # path to model file, i.e. yolov8n.pt, yolov8n.yaml
+model:  # path to model file, i.e. yolov8n.pt, yolov8n.yaml
 data: /home/jh/code/til/data/til23plushonly/dataset.yaml  # path to data file, i.e. coco128.yaml
-epochs: 300  # number of epochs to train for
-patience: 10  # epochs to wait for no observable improvement for early stopping of training
-batch: 8  # number of images per batch (-1 for AutoBatch)
+epochs: 100  # number of epochs to train for
+patience: 20  # epochs to wait for no observable improvement for early stopping of training
+batch: -1  # number of images per batch (-1 for AutoBatch)
 imgsz: 1280  # size of input images as integer or w,h
 save: True  # save train checkpoints and predict results
 save_period: 1 # Save checkpoint every x epochs (disabled if < 1)
 cache: False  # True/ram, disk or False. Use cache for data loading
 device: cuda:0  # device to run on, i.e. cuda device=0 or device=0,1,2,3 or device=cpu
-workers: 24  # number of worker threads for data loading (per RANK if DDP)
+workers: 6  # number of worker threads for data loading (per RANK if DDP)
 project:  # project name
-name: mvp/yolov5x6u  # experiment name, results saved to 'project/name' directory
+name: custom/unnamed  # experiment name, results saved to 'project/name' directory
 exist_ok: False  # whether to overwrite existing experiment
 pretrained: True  # whether to use a pretrained model
 optimizer: SGD  # optimizer to use, choices=['SGD', 'Adam', 'AdamW', 'RMSProp']
@@ -25,7 +25,7 @@ verbose: True  # whether to print verbose output
 seed: 42  # random seed for reproducibility
 deterministic: False  # whether to enable deterministic mode
 single_cls: False  # train multi-class data as single-class
-rect: True  # rectangular training if mode='train' or rectangular validation if mode='val'
+rect: False  # rectangular training if mode='train' or rectangular validation if mode='val'
 cos_lr: False  # use cosine learning rate scheduler
 close_mosaic: 0  # (int) disable mosaic augmentation for final epochs
 resume: False  # resume training from last checkpoint
@@ -81,7 +81,7 @@ lr0: 0.01  # initial learning rate (i.e. SGD=1E-2, Adam=1E-3)
 lrf: 0.003  # final learning rate (lr0 * lrf)
 momentum: 0.937  # SGD momentum/Adam beta1
 weight_decay: 0.0005  # optimizer weight decay 5e-4
-warmup_epochs: 3.0  # warmup epochs (fractions ok)
+warmup_epochs: 5.0  # warmup epochs (fractions ok)
 warmup_momentum: 0.8  # warmup initial momentum
 warmup_bias_lr: 0.1  # warmup initial bias lr
 box: 7.5  # box loss gain
