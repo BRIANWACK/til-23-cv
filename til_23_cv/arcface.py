@@ -1,6 +1,6 @@
 """Implementation of ArcFace.
 
-Adapted from
+Inspired by
 https://www.kaggle.com/code/zeta1996/pytorch-lightning-arcface-focal-loss.
 """
 import math
