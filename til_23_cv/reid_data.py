@@ -20,9 +20,9 @@ BORDER_MODE = cv2.BORDER_REPLICATE
 # Using similar augments as Object Detection.
 DEFAULT_TRANSFORMS = [
     A.Affine(
-        p=0.5,
+        p=0.7,
         rotate=(-90, 90),
-        shear=(-8, 8),
+        shear=(-10, 10),
         interpolation=cv2.INTER_CUBIC,
         mode=BORDER_MODE,
         fit_output=False,
@@ -30,20 +30,20 @@ DEFAULT_TRANSFORMS = [
     # Train images have 0.5 padding.
     A.CropAndPad(
         p=0.9,
-        percent=(-1 / 6, -0.08),
+        percent=(-1 / 5, -0.05),
         pad_mode=BORDER_MODE,
         sample_independently=True,
         interpolation=cv2.INTER_CUBIC,
     ),
     A.Flip(p=0.6),
     A.AdvancedBlur(
-        p=0.1, blur_limit=(5, 11), noise_limit=(0.0, 2.0), beta_limit=(0.0, 4.0)
+        p=0.1, blur_limit=(7, 15), noise_limit=(0.0, 2.0), beta_limit=(0.0, 4.0)
     ),
     A.CLAHE(p=0.1),
-    A.MotionBlur(p=0.1, blur_limit=(5, 11)),
-    A.ColorJitter(p=0.7, brightness=0.4, contrast=0.0, saturation=0.7, hue=0.01),
+    A.MotionBlur(p=0.1, blur_limit=(7, 15)),
+    A.ColorJitter(p=0.7, brightness=0.5, contrast=0.0, saturation=0.7, hue=0.01),
     A.ImageCompression(p=0.1, quality_lower=20, quality_upper=50),
-    A.GaussNoise(p=0.2, per_channel=True, var_limit=(500.0, 3000.0)),
+    A.GaussNoise(p=0.2, per_channel=True, var_limit=(1000.0, 5000.0)),
     A.ISONoise(p=0.2, intensity=(0.1, 0.5), color_shift=(0.03, 0.06)),
 ]
 
