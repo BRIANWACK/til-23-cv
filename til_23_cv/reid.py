@@ -11,8 +11,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from sklearn.metrics import silhouette_score
 from torch.optim import Adam
+from torch.optim.lr_scheduler import OneCycleLR
 
-# from torch.optim.lr_scheduler import OneCycleLR
 # from torchvision.ops import sigmoid_focal_loss
 
 __all__ = ["LitImEncoder"]
@@ -101,11 +101,14 @@ class LitImEncoder(pl.LightningModule):
     def configure_optimizers(self):
         """Configure optimizers."""
         # TODO: Make this actually configurable.
-        lr = 1e-3
+        lr = 1e-4
         # See https://github.com/Lightning-AI/lightning/issues/3095 on how to
         # change optimizer/scheduler midtraining for multi-stage finetune.
         optimizer = Adam(self.parameters(), lr=lr)
-        return optimizer
+        scheduler = OneCycleLR(optimizer, lr, total_steps=10000)
+        return dict(
+            optimizer=optimizer, lr_scheduler=dict(scheduler=scheduler, interval="step")
+        )
 
     def validation_step(self, batch: Tuple[torch.Tensor, torch.Tensor], batch_idx: int):
         """Validation step.
@@ -132,7 +135,8 @@ class LitImEncoder(pl.LightningModule):
         """Actual Validation Logic."""
         x = np.stack(self._eval_embeds)
         y = np.array(self._eval_lbls)
-        score: float = silhouette_score(x, y, metric="cosine")  # type: ignore
-        self.log("val_sil_score", score, prog_bar=True)
+        if len(np.unique(y)) > 1:
+            score: float = silhouette_score(x, y, metric="cosine")  # type: ignore
+            self.log("val_sil_score", score, prog_bar=True)
         self._eval_embeds.clear()
         self._eval_lbls.clear()
