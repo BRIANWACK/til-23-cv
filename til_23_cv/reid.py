@@ -4,6 +4,8 @@ from typing import List, Optional, Tuple
 
 import lightning.pytorch as pl
 import numpy as np
+import timm
+import timm.data
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -20,7 +22,12 @@ class LitImEncoder(pl.LightningModule):
     """LitImEncoder."""
 
     def __init__(
-        self, model: nn.Module, head: Optional[nn.Module] = None, nclasses: int = -1
+        self,
+        model_name: str,
+        head: Optional[nn.Module] = None,
+        nclasses: int = -1,
+        pretrained: bool = True,
+        im_size: int = 224,
     ):
         """Initialize LitImEncoder.
 
@@ -28,13 +35,25 @@ class LitImEncoder(pl.LightningModule):
         accept BC features and BN class targets (e.g., `til_23_cv.ArcMarginProduct`).
 
         Args:
-            model (nn.Module): Backbone model.
+            model_name (str): Backbone model from timm.
             head (nn.Module, optional): Training head. Defaults to None.
             nclasses (int, optional): Number of classes during training. Defaults to -1.
+            pretrained (bool, optional): Use pretrained backbone. Defaults to True.
+            im_size (int, optional): Image size. Defaults to 224.
         """
         super(LitImEncoder, self).__init__()
 
-        self.model = model
+        # See https://github.com/huggingface/pytorch-image-models/blob/v0.9.2/timm/models/vision_transformer.py#L387
+        # for config options.
+        self.model = timm.create_model(
+            model_name,
+            pretrained=pretrained,
+            num_classes=-1,
+            global_pool="token",
+            # NOTE: timm only supports pos encoding interpolation at init.
+            img_size=im_size,
+        )
+
         self.head = head
         self.nclasses = nclasses
         # TODO: Calculate class balance and provide `weight` to `nn.CrossEntropyLoss`.
@@ -46,9 +65,9 @@ class LitImEncoder(pl.LightningModule):
         self._eval_embeds: List[np.ndarray] = []
         self._eval_lbls: List[int] = []
 
-    def forward(self, x: torch.Tensor):
+    def forward(self, ims: torch.Tensor):
         """Forward pass."""
-        return self.model(x)
+        return self.model(ims)
 
     def training_step(self, batch: Tuple[torch.Tensor, torch.Tensor], batch_idx: int):
         """Training step.
@@ -114,6 +133,6 @@ class LitImEncoder(pl.LightningModule):
         x = np.stack(self._eval_embeds)
         y = np.array(self._eval_lbls)
         score: float = silhouette_score(x, y, metric="cosine")  # type: ignore
-        self.log("val_sil_score", score, on_epoch=True, prog_bar=True)
+        self.log("val_sil_score", score, prog_bar=True)
         self._eval_embeds.clear()
         self._eval_lbls.clear()
