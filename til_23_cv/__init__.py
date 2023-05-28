@@ -2,3 +2,4 @@
 
 from .arcface import *
 from .reid import *
+from .reid_data import *
