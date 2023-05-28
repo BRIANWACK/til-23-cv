@@ -12,11 +12,11 @@ from PIL import Image
 from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
 
+from til_23_cv.utils import BORDER_MODE, RGB_MEAN, RGB_STD
+
 __all__ = ["LitImClsDataModule"]
 
-BORDER_MODE = cv2.BORDER_REPLICATE
-# BORDER_MODE = cv2.BORDER_CONSTANT
-
+# TODO: Horrendous.
 # Using similar augments as Object Detection.
 DEFAULT_TRANSFORMS = [
     A.Affine(
@@ -57,8 +57,8 @@ class LitImClsDataModule(pl.LightningDataModule):
         im_size: int = 224,
         batch_size: int = 32,
         num_workers: int = 4,
-        rgb_mean: Tuple[float, float, float] = (0.485, 0.456, 0.406),
-        rgb_std: Tuple[float, float, float] = (0.229, 0.224, 0.225),
+        rgb_mean: Tuple[float, float, float] = RGB_MEAN,
+        rgb_std: Tuple[float, float, float] = RGB_STD,
     ):
         """Initialize LitImClsDataModule."""
         super(LitImClsDataModule, self).__init__()

@@ -3,6 +3,7 @@
 /runs
 /lightning_logs
 *.pt
+*.torchscript
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
