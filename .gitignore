@@ -1,6 +1,7 @@
 # Others
 /data
 /runs
+/lightning_logs
 *.pt
 
 # Byte-compiled / optimized / DLL files

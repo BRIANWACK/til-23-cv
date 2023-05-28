@@ -101,7 +101,7 @@ class LitImEncoder(pl.LightningModule):
     def configure_optimizers(self):
         """Configure optimizers."""
         # TODO: Make this actually configurable.
-        lr = 1e-5
+        lr = 5e-5
         # See https://github.com/Lightning-AI/lightning/issues/3095 on how to
         # change optimizer/scheduler midtraining for multi-stage finetune.
         optimizer = Adam(self.parameters(), lr=lr)
