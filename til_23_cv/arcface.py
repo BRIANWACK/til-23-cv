@@ -44,19 +44,24 @@ class ArcMarginProduct(nn.Module):
         self.th = math.cos(math.pi - m)
         self.mm = math.sin(math.pi - m) * m
 
-    def forward(self, feats: torch.Tensor, tgts: torch.Tensor) -> torch.Tensor:
+    def forward(
+        self, feats: torch.Tensor, tgts: torch.Tensor, eps=1e-8
+    ) -> torch.Tensor:
         """Calculate ArcMarginProduct logits.
 
         Args:
             feats (torch.Tensor): BC features.
             tgts (torch.Tensor): BN class targets.
+            eps (float, optional): Epsilon. Defaults to 1e-8.
 
         Returns:
             torch.Tensor: BN logits.
         """
         # BC -> BN
-        cosine = F.linear(F.normalize(feats), F.normalize(self.weight))
-        sine = (1.0 - cosine.square()).sqrt()
+        cosine = F.linear(
+            F.normalize(feats, eps=eps), F.normalize(self.weight, eps=eps)
+        )
+        sine = (1.0 - cosine.square()).clamp(eps).sqrt()
         phi = cosine * self.cos_m - sine * self.sin_m
         phi = phi.where(cosine > self.th, cosine - self.mm)
         logits = self.s * (tgts * phi + (1.0 - tgts) * cosine)
