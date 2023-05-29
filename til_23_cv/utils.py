@@ -101,7 +101,8 @@ def thres_strategy_softmax(scores: list, temp=0.8, ratio=1.4):
     x = np.array(scores) / temp  # type: ignore
     ex = np.exp(x - np.max(x))
     ex /= ex.sum() + 1e-12
-    if np.max(ex) > ratio / len(ex):
+    # TODO: Figure out proper solution to sensitivity.
+    if np.max(ex) > ratio / (len(ex) + 1):
         return np.argmax(ex)
     return -1
 
