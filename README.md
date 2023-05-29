@@ -25,6 +25,8 @@
   - DINOv2 (ViT-S/14) chosen for similar size to ResNet50 and State of the Art Object-Centric Representations via Self-Supervised Learning.
 - TODO: Reproducible hyperparameter system.
 - ArcFace loss was used to reshape model's latent space into a hypersphere for cosine similarity: <https://arxiv.org/abs/1801.07698>.
+- `sklearn` [Silhouette Score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.silhouette_score.html) was used for cluster evaluation.
+- Training code is custom based on [PyTorch Lightning](https://www.pytorchlightning.ai/).
 
 ### Others
 

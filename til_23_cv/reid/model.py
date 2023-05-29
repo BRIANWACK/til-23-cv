@@ -1,6 +1,6 @@
 """Suspect Recognition model."""
 
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 import lightning.pytorch as pl
 import numpy as np
@@ -13,53 +13,59 @@ from sklearn.metrics import silhouette_score
 from torch.optim import Adam
 from torch.optim.lr_scheduler import OneCycleLR
 
-# from torchvision.ops import sigmoid_focal_loss
+from .arcface import ArcMarginProduct
 
-__all__ = ["LitImEncoder"]
+__all__ = ["LitArcEncoder"]
 
 
-class LitImEncoder(pl.LightningModule):
-    """LitImEncoder."""
+class LitArcEncoder(pl.LightningModule):
+    """LitArcEncoder."""
 
     def __init__(
         self,
         model_name: str,
-        head: Optional[nn.Module] = None,
-        nclasses: int = -1,
         pretrained: bool = True,
         im_size: int = 224,
+        nclasses: int = -1,
+        arc_s: float = 32.0,
+        arc_m: float = 0.5,
+        lr: float = 5e-5,
+        sched_steps: int = 10000,
     ):
-        """Initialize LitImEncoder.
-
-        ``head`` and ``nclasses`` are only required during training. ``head`` should
-        accept BC features and BN class targets (e.g., `til_23_cv.ArcMarginProduct`).
+        """Initialize LitArcEncoder.
 
         Args:
             model_name (str): Backbone model from timm.
-            head (nn.Module, optional): Training head. Defaults to None.
-            nclasses (int, optional): Number of classes during training. Defaults to -1.
             pretrained (bool, optional): Use pretrained backbone. Defaults to True.
             im_size (int, optional): Image size. Defaults to 224.
+            nclasses (int, optional): Number of classes during training. Defaults to -1.
+            arc_s (float, optional): ArcFace logit scaling factor. Defaults to 32.0.
+            arc_m (float, optional): ArcFace angular margin. Defaults to 0.5.
+            lr (float, optional): Max learning rate. Defaults to 5e-5.
+            sched_steps (int, optional): Number of steps for OneCycleLR. Defaults to 10000.
         """
-        super(LitImEncoder, self).__init__()
+        super(LitArcEncoder, self).__init__()
+        self.save_hyperparameters()
+
+        self.nclasses = nclasses
+        self.lr = lr
+        self.sched_steps = sched_steps
 
         # See https://github.com/huggingface/pytorch-image-models/blob/v0.9.2/timm/models/vision_transformer.py#L387
         # for config options.
         self.model = timm.create_model(
             model_name,
             pretrained=pretrained,
-            num_classes=-1,
-            global_pool="token",
+            num_classes=-1,  # Needs to be -1 to disable FC layer.
+            global_pool="token",  # Use cls token.
             # NOTE: timm only supports pos encoding interpolation at init.
             img_size=im_size,
         )
-
-        self.head = head
-        self.nclasses = nclasses
+        self.head = ArcMarginProduct(
+            self.model.num_features, nclasses, s=arc_s, m=arc_m
+        )
         # TODO: Calculate class balance and provide `weight` to `nn.CrossEntropyLoss`.
         self.loss = nn.CrossEntropyLoss(reduction="mean")
-        # TODO: Try focal Loss to deal with class imbalance.
-        # loss = sigmoid_focal_loss(logits, tgts, reduction="mean")
 
         # (embeddings, label) produced during testing.
         self._eval_embeds: List[np.ndarray] = []
@@ -82,7 +88,7 @@ class LitImEncoder(pl.LightningModule):
         Returns:
             torch.Tensor: Loss.
         """
-        assert self.head is not None and self.nclasses > 0
+        assert self.nclasses > 0
         ims, lbls = batch
 
         # BCHW -> BC
@@ -100,12 +106,10 @@ class LitImEncoder(pl.LightningModule):
 
     def configure_optimizers(self):
         """Configure optimizers."""
-        # TODO: What is Lightning's hparam system?
-        lr = 5e-5
         # See https://github.com/Lightning-AI/lightning/issues/3095 on how to
         # change optimizer/scheduler midtraining for multi-stage finetune.
-        optimizer = Adam(self.parameters(), lr=lr)
-        scheduler = OneCycleLR(optimizer, lr, total_steps=10000)
+        optimizer = Adam(self.parameters(), lr=self.lr)
+        scheduler = OneCycleLR(optimizer, self.lr, total_steps=self.sched_steps)
         return dict(
             optimizer=optimizer, lr_scheduler=dict(scheduler=scheduler, interval="step")
         )
@@ -123,7 +127,7 @@ class LitImEncoder(pl.LightningModule):
             batch (Tuple[torch.Tensor, torch.Tensor]): Batch of images and labels.
             batch_idx (int): Batch index.
         """
-        assert self.head is not None and self.nclasses > 0
+        assert self.nclasses > 0
         ims, lbls = batch
         # BCHW -> BC
         feats = self.forward(ims)
