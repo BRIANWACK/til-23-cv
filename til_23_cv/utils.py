@@ -82,7 +82,7 @@ def thres_strategy_A(scores: list, accept_thres=0.3, vote_thres=0.0, sd_thres=4.
     return -1
 
 
-def evaluate_threshold_function(ds, sus_cls, func, x_axis, suspect_dropout):
+def evaluate_threshold_function(ds, sus_cls, func, x_axis, suspect_dropout, fixed=None):
     """Used in data.ipynb to evaluate threshold functions."""
     from tqdm import tqdm
 
@@ -96,6 +96,8 @@ def evaluate_threshold_function(ds, sus_cls, func, x_axis, suspect_dropout):
 
     for thres in tqdm(x_axis):
         tp, fp, tn, fn = 0, 0, 0, 0
+        if fixed is not None:
+            suspect_dropout = thres
         for logits, gt in zip(all_logits, all_gts):  # type: ignore
             logits = np.array(logits).copy()
             no_suspect = np.random.rand() < suspect_dropout
@@ -103,7 +105,7 @@ def evaluate_threshold_function(ds, sus_cls, func, x_axis, suspect_dropout):
             if no_suspect:
                 logits[gt] = np.delete(logits, gt).mean()
 
-            pred = func(logits, thres)
+            pred = func(logits, thres if fixed is None else fixed)
             if no_suspect and pred == -1:
                 tn += 1
             elif not no_suspect and pred == gt:
