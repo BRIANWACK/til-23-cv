@@ -54,7 +54,7 @@ def cos_sim(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 
-def thres_strategy_A(scores: list, accept_thres=0.7, vote_thres=0.1, sd=3):
+def thres_strategy_A(scores: list, accept_thres=0.3, vote_thres=0.0, sd_thres=4.4):
     """Strategy A.
 
     If any in ``scores`` is greater than ``accept_thres``, return the index of the
@@ -69,7 +69,7 @@ def thres_strategy_A(scores: list, accept_thres=0.7, vote_thres=0.1, sd=3):
         scores (List[float]): List of scores.
         accept_thres (float, optional): Threshold for accepting a prediction. Defaults to 0.7.
         vote_thres (float, optional): Threshold for voting. Defaults to 0.1.
-        sd (int, optional): Number of standard deviations away from the mean. Defaults to 3.
+        sd_thres (float, optional): Number of standard deviations away from the mean. Defaults to 5.0.
     """
     if np.max(scores) > accept_thres:
         return np.argmax(scores)
@@ -77,6 +77,6 @@ def thres_strategy_A(scores: list, accept_thres=0.7, vote_thres=0.1, sd=3):
         scores = np.array(scores).clip(0.0)  # type: ignore
         mean = np.mean(scores[scores < np.max(scores)])
         std = np.std(scores[scores < np.max(scores)])
-        if np.max(scores) - mean > sd * std:
+        if np.max(scores) - mean > sd_thres * std:
             return np.argmax(scores)
     return -1
