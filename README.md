@@ -37,7 +37,8 @@
 Only Python 3.9 is supported at the moment to speed up dependency resolution.
 
 ```sh
-git clone --recurse-submodules https://github.com/Interpause/til-23-cv.git
+# Ignore submodules; Will be installed from source in requirements.txt.
+git clone https://github.com/Interpause/til-23-cv.git
 pip install -r requirements.txt
 
 # Or...
@@ -45,13 +46,10 @@ pip install -r requirements.txt
 pip install git+https://github.com/Interpause/til-23-cv.git
 ```
 
-Or if in a notebook:
+Or if in a notebook (or using the competition platform):
 
 ```py
-!git submodule update --init --recursive
 %pip install -r requirements.txt
-# May be ../ultralytics if magic cwd cell isn't run yet.
-%pip install -e ./ultralytics
 ```
 
 ## Data Preparation
