@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 from albumentations.pytorch.transforms import ToTensorV2
 
-__all__ = ["ReIDEncoder", "cos_sim", "thres_strategy_A"]
+__all__ = ["ReIDEncoder", "cos_sim", "thres_strategy_A", "evaluate_threshold_function"]
 
 BORDER_MODE = cv2.BORDER_REPLICATE
 # BORDER_MODE = cv2.BORDER_CONSTANT
@@ -80,3 +80,51 @@ def thres_strategy_A(scores: list, accept_thres=0.3, vote_thres=0.0, sd_thres=4.
         if np.max(scores) - mean > sd_thres * std:
             return np.argmax(scores)
     return -1
+
+
+def evaluate_threshold_function(ds, sus_cls, func, x_axis, suspect_dropout):
+    """Used in data.ipynb to evaluate threshold functions."""
+    from tqdm import tqdm
+
+    np.random.seed(42)
+    acc_axis = []
+    p_axis = []
+    r_axis = []
+    f_axis = []
+    all_logits = [np.array(s["logits"]).copy() for s in ds]
+    all_gts = [sus_cls.index(s["ground_truth"].label) for s in ds]
+
+    for thres in tqdm(x_axis):
+        tp, fp, tn, fn = 0, 0, 0, 0
+        for logits, gt in zip(all_logits, all_gts):  # type: ignore
+            logits = np.array(logits).copy()
+            no_suspect = np.random.rand() < suspect_dropout
+
+            if no_suspect:
+                logits[gt] = np.delete(logits, gt).mean()
+
+            pred = func(logits, thres)
+            if no_suspect and pred == -1:
+                tn += 1
+            elif not no_suspect and pred == gt:
+                tp += 1
+            elif no_suspect and pred != -1:
+                fp += 1
+            elif not no_suspect and pred == -1:
+                fn += 1
+            elif not no_suspect and pred != gt:
+                # We don't count false predictions for now.
+                # fp += 1
+                pass
+
+        acc = (tp + tn) / max(tp + tn + fp + fn, 1)
+        p = tp / max(tp + fp, 1)
+        r = tp / max(tp + fn, 1)
+        f = 2 * p * r / max(p + r, 1e-6)
+
+        acc_axis.append(acc)
+        p_axis.append(p)
+        r_axis.append(r)
+        f_axis.append(f)
+
+    return acc_axis, p_axis, r_axis, f_axis
