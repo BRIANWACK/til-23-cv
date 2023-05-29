@@ -8,7 +8,7 @@
 
 - YOLOv5u6 models were chosen because `1280p` pretraining, see <https://docs.ultralytics.com/models/yolov5>.
   - Model download: <https://github.com/ultralytics/assets/releases/tag/v0.0.0>.
-  - `ultralytics` auto-download: `model = YOLO("yolov5m6u.pt")`, `yolo detect benchmark model=yolov5m6u.pt`, or any `yolo` command with `model=yolov5m6u.pt`.
+  - Model is auto-downloaded by `ultralytics`, no explicit download required.
   - `yolov5m6u.pt` was chosen based on vram limitations and effective batch size.
 - Model training was stopped early at epoch 84, and `best.pt` was renamed to `custom_yolov5m6u_best.pt`.
   - NOTE: Config file specifies 300 epochs to preserve original lr curve used. `Ctrl+C` recommended to interrupt training early.
@@ -21,12 +21,18 @@
 
 - DINOv2 model was used as encoder/backbone via [`timm`](https://github.com/huggingface/pytorch-image-models).
   - Model download: <https://huggingface.co/timm/vit_small_patch14_dinov2.lvd142m>.
+  - Model is auto-downloaded by `timm`, no explicit download required.
   - DINOv2 (ViT-S/14) chosen for similar size to ResNet50 and State of the Art Object-Centric Representations via Self-Supervised Learning.
 - TODO: Reproducible hyperparameter system.
 - ArcFace loss was used to reshape model's latent space into a hypersphere for cosine similarity: <https://arxiv.org/abs/1801.07698>.
 
 ### Others
 
+- For the competition platform, `%%sh ./setup.sh` is included in the notebooks
+  - Remember to regularly "Write changes to dataset"!
+  - `./data` is symlinked to the "data" dataset to store datasets.
+  - `./models` is symlinked to the "models" dataset to store final models.
+  - `./runs` is symlinked to the "Storage" dataset to store logs and training checkpoints.
 - "I have code OCD. Poetry is love, Poetry is life. And GG users of Conda."
   - As one said in a group chat by the great engineer, [@Interpause](https://github.com/interpause) (John-Henry Lim).
 - The real reason I chose DINOv2 was PTSD.
@@ -44,12 +50,6 @@ pip install -r requirements.txt
 # Or...
 # TODO: Support below; Key requirement is to code with module invocation in mind
 pip install git+https://github.com/Interpause/til-23-cv.git
-```
-
-Or if in a notebook (or using the competition platform):
-
-```py
-%pip install -r requirements.txt
 ```
 
 ## Data Preparation

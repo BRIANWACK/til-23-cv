@@ -1,7 +1,7 @@
 # Others
 /data
 /runs
-/lightning_logs
+/models
 *.pt
 *.torchscript
 

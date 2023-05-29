@@ -33,7 +33,6 @@ class ReIDEncoder(nn.Module):
     def __init__(self, model_path: str, device="cpu"):
         """Initialize ReIDEncoder."""
         super(ReIDEncoder, self).__init__()
-        assert "torchscript" in model_path, "I am lazy."
         traced = torch.jit.load(model_path)
         self.encoder = torch.jit.optimize_for_inference(traced)
         self.normalize = A.Compose(
