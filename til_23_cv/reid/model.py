@@ -23,7 +23,7 @@ class LitArcEncoder(pl.LightningModule):
 
     def __init__(
         self,
-        model_name: str,
+        model_name: str = "vit_small_patch14_dinov2.lvd142m",
         pretrained: bool = True,
         im_size: int = 224,
         nclasses: int = -1,
@@ -35,7 +35,7 @@ class LitArcEncoder(pl.LightningModule):
         """Initialize LitArcEncoder.
 
         Args:
-            model_name (str): Backbone model from timm.
+            model_name (str, optional): Backbone model from timm. Defaults to "vit_small_patch14_dinov2.lvd142m".
             pretrained (bool, optional): Use pretrained backbone. Defaults to True.
             im_size (int, optional): Image size. Defaults to 224.
             nclasses (int, optional): Number of classes during training. Defaults to -1.

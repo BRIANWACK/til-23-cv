@@ -16,7 +16,7 @@ from til_23_cv.utils import BORDER_MODE, RGB_MEAN, RGB_STD
 
 __all__ = ["LitImClsDataModule"]
 
-# TODO: Horrendous.
+# TODO: Horrendous and cannot be configured.
 # Using similar augments as Object Detection.
 DEFAULT_TRANSFORMS = [
     A.Affine(
@@ -41,7 +41,8 @@ DEFAULT_TRANSFORMS = [
     ),
     A.CLAHE(p=0.1),
     A.MotionBlur(p=0.1, blur_limit=(7, 15)),
-    A.ColorJitter(p=0.7, brightness=0.5, contrast=0.0, saturation=0.7, hue=0.01),
+    A.ColorJitter(p=0.7, brightness=0.5, contrast=0.0, saturation=0.8, hue=0.02),
+    A.ToGray(p=0.1),
     A.ImageCompression(p=0.1, quality_lower=20, quality_upper=50),
     A.GaussNoise(p=0.2, per_channel=True, var_limit=(1000.0, 5000.0)),
     A.ISONoise(p=0.2, intensity=(0.1, 0.5), color_shift=(0.03, 0.06)),
@@ -53,15 +54,16 @@ class LitImClsDataModule(pl.LightningDataModule):
 
     def __init__(
         self,
-        data_dir: str,
+        data_dir: str = "data/til23reid",
         im_size: int = 224,
-        batch_size: int = 32,
-        num_workers: int = 4,
+        batch_size: int = 128,
+        num_workers: int = 16,
         rgb_mean: Tuple[float, float, float] = RGB_MEAN,
         rgb_std: Tuple[float, float, float] = RGB_STD,
     ):
         """Initialize LitImClsDataModule."""
         super(LitImClsDataModule, self).__init__()
+        self.save_hyperparameters()
 
         self.im_size = im_size
         self.data_dir = data_dir
@@ -96,6 +98,11 @@ class LitImClsDataModule(pl.LightningDataModule):
             ]
         )
         self.train_transform = A.Compose(DEFAULT_TRANSFORMS)
+
+        # Find number of classes.
+        self.setup("fit")
+        assert self.train_ds is not None
+        self.nclasses = len(self.train_ds.classes)
 
     def _transform(self, im, is_train):
         im = np.array(im)

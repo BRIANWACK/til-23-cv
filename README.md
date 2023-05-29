@@ -23,10 +23,10 @@
   - Model download: <https://huggingface.co/timm/vit_small_patch14_dinov2.lvd142m>.
   - Model is auto-downloaded by `timm`, no explicit download required.
   - DINOv2 (ViT-S/14) chosen for similar size to ResNet50 and State of the Art Object-Centric Representations via Self-Supervised Learning.
-- TODO: Reproducible hyperparameter system.
 - ArcFace loss was used to reshape model's latent space into a hypersphere for cosine similarity: <https://arxiv.org/abs/1801.07698>.
 - `sklearn` [Silhouette Score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.silhouette_score.html) was used for cluster evaluation.
 - Training code is custom based on [PyTorch Lightning](https://www.pytorchlightning.ai/).
+  - Especially [Lightning CLI](https://lightning.ai/docs/pytorch/stable/cli/lightning_cli.html).
 
 ### Others
 
@@ -93,9 +93,13 @@ yolo detect train cfg=cfg/custom.yaml model=yolov5m6u.pt data=data/til23plushonl
 
 ### Suspect Recognition
 
-See [`notebooks/reid.ipynb`](./notebooks/reid.ipynb).
+See [`notebooks/reid.ipynb`](./notebooks/reid.ipynb) or use the command below:
 
-TODO: CLI and hyperparameter system for training.
+```sh
+python -m til23cv.reid fit --config cfg/reid.yaml
+```
+
+Refer to the aforementioned notebook for subsequent export of model to `torchscript`.
 
 ## Inference
 

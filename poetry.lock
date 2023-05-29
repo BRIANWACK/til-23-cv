@@ -757,6 +757,17 @@ cli = ["click (==8.1.3)", "pyyaml (==6.0)"]
 optimize = ["orjson"]
 
 [[package]]
+name = "docstring-parser"
+version = "0.15"
+description = "Parse Python docstrings in reST, Google and Numpydoc format"
+optional = false
+python-versions = ">=3.6,<4.0"
+files = [
+    {file = "docstring_parser-0.15-py3-none-any.whl", hash = "sha256:d1679b86250d269d06a99670924d6bce45adc00b08069dae8c47d98e89b667a9"},
+    {file = "docstring_parser-0.15.tar.gz", hash = "sha256:48ddc093e8b1865899956fcc03b03e66bb7240c310fac5af81814580c55bf682"},
+]
+
+[[package]]
 name = "executing"
 version = "1.2.0"
 description = "Get the currently executing AST node of a frame, and other information"
@@ -1305,6 +1316,43 @@ files = [
     {file = "joblib-1.2.0-py3-none-any.whl", hash = "sha256:091138ed78f800342968c523bdde947e7a305b8594b910a0fea2ab83c3c6d385"},
     {file = "joblib-1.2.0.tar.gz", hash = "sha256:e1cee4a79e4af22881164f218d4311f60074197fb707e082e803b61f6d137018"},
 ]
+
+[[package]]
+name = "jsonargparse"
+version = "4.21.1"
+description = "Implement minimal boilerplate CLIs derived from type hints and parse from command line, config files and environment variables."
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "jsonargparse-4.21.1-py3-none-any.whl", hash = "sha256:dffb6a446d2a7d3b78288489b406d77f5bf83c9ea10e7cfce43a1029fbbde313"},
+    {file = "jsonargparse-4.21.1.tar.gz", hash = "sha256:c70700a33c16038c6b71d6ddbd7dcc58cf07865f5e0a0f0a7406b90f3a306bcc"},
+]
+
+[package.dependencies]
+docstring-parser = {version = ">=0.15", optional = true, markers = "extra == \"signatures\""}
+PyYAML = ">=3.13"
+typeshed-client = {version = ">=2.1.0", optional = true, markers = "extra == \"signatures\""}
+typing-extensions = {version = ">=3.10.0.0", optional = true, markers = "python_version < \"3.10\" and extra == \"typing-extensions\""}
+
+[package.extras]
+all = ["jsonargparse[argcomplete]", "jsonargparse[fsspec]", "jsonargparse[jsonnet]", "jsonargparse[jsonschema]", "jsonargparse[omegaconf]", "jsonargparse[reconplogger]", "jsonargparse[ruyaml]", "jsonargparse[signatures]", "jsonargparse[typing-extensions]", "jsonargparse[urls]"]
+argcomplete = ["argcomplete (>=2.0.0)"]
+dev = ["jsonargparse[doc]", "jsonargparse[mypy]", "jsonargparse[test]", "pre-commit (>=2.19.0)", "pycodestyle (>=2.5.0)", "tox (>=3.25.0)"]
+doc = ["Sphinx (>=1.7.9)", "autodocsumm (>=0.1.10)", "sphinx-autodoc-typehints (>=1.19.5)", "sphinx-rtd-theme (>=0.4.3)"]
+fsspec = ["fsspec (>=0.8.4)"]
+jsonnet = ["jsonnet (>=0.13.0)", "jsonnet-binary (>=0.17.0)"]
+jsonschema = ["jsonschema (>=3.2.0)"]
+maintainer = ["bump2version (>=0.5.11)"]
+mypy = ["jsonargparse[types-pyyaml]", "mypy (>=0.701)"]
+omegaconf = ["omegaconf (>=2.1.1)"]
+reconplogger = ["reconplogger (>=4.4.0)"]
+ruyaml = ["ruyaml (>=0.20.0)"]
+signatures = ["docstring-parser (>=0.15)", "jsonargparse[typing-extensions]", "typeshed-client (>=2.1.0)"]
+test = ["attrs (>=22.2.0)", "jsonargparse[test-no-urls]", "jsonargparse[types-pyyaml]", "pydantic (>=1.10.7)", "responses (>=0.12.0)", "types-requests (>=2.28.9)"]
+test-no-urls = ["coverage (>=4.5.1)", "pytest (>=6.2.5)", "pytest-subtests (>=0.8.0)"]
+types-pyyaml = ["types-PyYAML (>=6.0.11)"]
+typing-extensions = ["typing-extensions (>=3.10.0.0)"]
+urls = ["requests (>=2.18.4)"]
 
 [[package]]
 name = "jupyter-client"
@@ -3607,6 +3655,20 @@ tests = ["autopep8", "flake8", "isort", "numpy", "pytest", "scipy (>=1.7.1)"]
 tutorials = ["matplotlib", "pandas", "tabulate"]
 
 [[package]]
+name = "typeshed-client"
+version = "2.3.0"
+description = "A library for accessing stubs in typeshed."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "typeshed_client-2.3.0-py3-none-any.whl", hash = "sha256:27976287e0682be3005233f08f6f3cedf0c496413bcb213378f46e08798988c4"},
+    {file = "typeshed_client-2.3.0.tar.gz", hash = "sha256:e2734755f93a0b6c1da8daad11670c75a36583d889d4d7b110eb882765b8bced"},
+]
+
+[package.dependencies]
+importlib-resources = ">=1.4.0"
+
+[[package]]
 name = "typing-extensions"
 version = "4.6.2"
 description = "Backported and Experimental Type Hints for Python 3.7+"
@@ -3933,4 +3995,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "3.9.*"
-content-hash = "719f7e2db47f9ad41ff8091d9529cb3950a3c79d32b2f8d9457940a1f4bd065d"
+content-hash = "1aa39d060bbc98d95601dc35daa2e5da363b8e091001406258c994a7505a019e"
