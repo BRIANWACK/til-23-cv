@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 from albumentations.pytorch.transforms import ToTensorV2
 
-__all__ = ["ReIDEncoder", "cos_sim"]
+__all__ = ["ReIDEncoder", "cos_sim", "thres_strategy_A"]
 
 BORDER_MODE = cv2.BORDER_REPLICATE
 # BORDER_MODE = cv2.BORDER_CONSTANT
@@ -52,3 +52,31 @@ class ReIDEncoder(nn.Module):
 def cos_sim(a, b):
     """Cosine similarity between two vectors."""
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+
+def thres_strategy_A(scores: list, accept_thres=0.7, vote_thres=0.1, sd=3):
+    """Strategy A.
+
+    If any in ``scores`` is greater than ``accept_thres``, return the index of the
+    max score. If any in ``scores`` is greater than ``vote_thres``, return the index
+    of the max score if it is greater than ``sd`` standard deviations away from
+    the mean of ``scores`` (excluding the max score). Otherwise, return -1.
+
+    I am not aware of this strategy in any literature, so it is essentially my own
+    delusion.
+
+    Args:
+        scores (List[float]): List of scores.
+        accept_thres (float, optional): Threshold for accepting a prediction. Defaults to 0.7.
+        vote_thres (float, optional): Threshold for voting. Defaults to 0.1.
+        sd (int, optional): Number of standard deviations away from the mean. Defaults to 3.
+    """
+    if np.max(scores) > accept_thres:
+        return np.argmax(scores)
+    elif np.max(scores) > vote_thres:
+        scores = np.array(scores).clip(0.0)  # type: ignore
+        mean = np.mean(scores[scores < np.max(scores)])
+        std = np.std(scores[scores < np.max(scores)])
+        if np.max(scores) - mean > sd * std:
+            return np.argmax(scores)
+    return -1
