@@ -7,7 +7,14 @@ import torch
 import torch.nn as nn
 from albumentations.pytorch.transforms import ToTensorV2
 
-__all__ = ["ReIDEncoder", "cos_sim", "thres_strategy_A", "evaluate_threshold_function"]
+__all__ = [
+    "ReIDEncoder",
+    "cos_sim",
+    "thres_strategy_A",
+    "thres_strategy_naive",
+    "thres_strategy_softmax",
+    "evaluate_threshold_function",
+]
 
 BORDER_MODE = cv2.BORDER_REPLICATE
 # BORDER_MODE = cv2.BORDER_CONSTANT
@@ -79,6 +86,23 @@ def thres_strategy_A(scores: list, accept_thres=0.3, vote_thres=0.0, sd_thres=4.
         std = np.std(scores[scores < np.max(scores)])
         if np.max(scores) - mean > sd_thres * std:
             return np.argmax(scores)
+    return -1
+
+
+def thres_strategy_naive(scores: list, thres=0.3):
+    """Naive thresholding strategy."""
+    if np.max(scores) > thres:
+        return np.argmax(scores)
+    return -1
+
+
+def thres_strategy_softmax(scores: list, temp=0.8, ratio=1.4):
+    """Threshold using softmax."""
+    x = np.array(scores) / temp  # type: ignore
+    ex = np.exp(x - np.max(x))
+    ex /= ex.sum() + 1e-12
+    if np.max(ex) > ratio / len(ex):
+        return np.argmax(ex)
     return -1
 
 
