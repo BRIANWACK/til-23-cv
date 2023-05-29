@@ -19,12 +19,18 @@
 
 ### Suspect Recognition
 
-TODO.
+- DINOv2 model was used as encoder/backbone via [`timm`](https://github.com/huggingface/pytorch-image-models).
+  - Model download: <https://huggingface.co/timm/vit_small_patch14_dinov2.lvd142m>.
+  - DINOv2 (ViT-S/14) chosen for similar size to ResNet50 and State of the Art Object-Centric Representations via Self-Supervised Learning.
+- TODO: Reproducible hyperparameter system.
+- ArcFace loss was used to reshape model's latent space into a hypersphere for cosine similarity: <https://arxiv.org/abs/1801.07698>.
 
 ### Others
 
 - "I have code OCD. Poetry is love, Poetry is life. And GG users of Conda."
   - As one said in a group chat by the great engineer, [@Interpause](https://github.com/interpause) (John-Henry Lim).
+- The real reason I chose DINOv2 was PTSD.
+  - Behold! My internship project "Self-Supervised Learning of Video Object Segmentation using DINOSAUR and SAVi": [Interpause/dinosavi](https://github.com/Interpause/dinosavi).
 
 ## Installation
 
@@ -41,9 +47,11 @@ pip install git+https://github.com/Interpause/til-23-cv.git
 
 Or if in a notebook:
 
-```ipynb
+```py
 !git submodule update --init --recursive
 %pip install -r requirements.txt
+# May be ../ultralytics if magic cwd cell isn't run yet.
+%pip install -e ./ultralytics
 ```
 
 ## Data Preparation
@@ -71,7 +79,7 @@ Or if in a notebook:
 
 ### Suspect Recognition
 
-TODO.
+- See [`notebooks/data.ipynb`](./notebooks/data.ipynb) for converting `til23plush` into `til23reid` dataset, which uses the typical image classification folder structure.
 
 ## Training
 
@@ -85,11 +93,13 @@ yolo detect train cfg=cfg/custom.yaml model=yolov5m6u.pt data=data/til23plushonl
 
 ### Suspect Recognition
 
-TODO.
+See [`notebooks/reid.ipynb`](./notebooks/reid.ipynb).
+
+TODO: CLI and hyperparameter system for training.
 
 ## Inference
 
-TODO.
+See [`notebooks/infer.ipynb`](./notebooks/infer.ipynb).
 
 ## Contribution Guide
 
