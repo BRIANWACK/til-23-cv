@@ -13,14 +13,14 @@ from .model import LitArcEncoder
 
 __all__ = ["cli_main"]
 
-PARSER_KWARGS = dict(
+PARSER_KWARGS = lambda: dict(
     fit=dict(
         default_config_files=["cfg/reid.yaml"],
     ),
 )
 
 # https://lightning.ai/docs/pytorch/stable/common/trainer.html
-TRAINER_DEFAULTS = dict(
+TRAINER_DEFAULTS = lambda: dict(
     # https://lightning.ai/docs/pytorch/stable/extensions/callbacks.html
     callbacks=[
         LearningRateMonitor(logging_interval="step"),
@@ -28,7 +28,7 @@ TRAINER_DEFAULTS = dict(
         ModelCheckpoint(
             monitor="val_sil_score",
             mode="max",
-            save_top_k=5,
+            save_top_k=2,
             save_last=True,
             filename="{epoch}-{val_sil_score:.3f}",
         ),
@@ -74,8 +74,8 @@ def cli_main(args=None):
         LitImClsDataModule,
         seed_everything_default=42,
         args=args,
-        parser_kwargs=PARSER_KWARGS,
-        trainer_defaults=TRAINER_DEFAULTS,
+        parser_kwargs=PARSER_KWARGS(),
+        trainer_defaults=TRAINER_DEFAULTS(),
         run=run,
     )
     return cli
