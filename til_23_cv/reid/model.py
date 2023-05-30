@@ -30,7 +30,7 @@ class LitArcEncoder(pl.LightningModule):
         arc_s: float = 32.0,
         arc_m: float = 0.5,
         lr: float = 5e-5,
-        sched_steps: int = 10000,
+        sched_steps: int = -1,
     ):
         """Initialize LitArcEncoder.
 
@@ -42,7 +42,7 @@ class LitArcEncoder(pl.LightningModule):
             arc_s (float, optional): ArcFace logit scaling factor. Defaults to 32.0.
             arc_m (float, optional): ArcFace angular margin. Defaults to 0.5.
             lr (float, optional): Max learning rate. Defaults to 5e-5.
-            sched_steps (int, optional): Number of steps for OneCycleLR. Defaults to 10000.
+            sched_steps (int, optional): Number of steps for OneCycleLR. Defaults to -1.
         """
         super(LitArcEncoder, self).__init__()
         self.save_hyperparameters()
@@ -50,6 +50,7 @@ class LitArcEncoder(pl.LightningModule):
         self.nclasses = nclasses
         self.lr = lr
         self.sched_steps = sched_steps
+        self.best_score = -1.0
 
         # See https://github.com/huggingface/pytorch-image-models/blob/v0.9.2/timm/models/vision_transformer.py#L387
         # for config options.
@@ -109,6 +110,8 @@ class LitArcEncoder(pl.LightningModule):
         # See https://github.com/Lightning-AI/lightning/issues/3095 on how to
         # change optimizer/scheduler midtraining for multi-stage finetune.
         optimizer = Adam(self.parameters(), lr=self.lr)
+        if self.sched_steps == -1:
+            return optimizer
         scheduler = OneCycleLR(optimizer, self.lr, total_steps=self.sched_steps)
         return dict(
             optimizer=optimizer, lr_scheduler=dict(scheduler=scheduler, interval="step")
@@ -142,5 +145,6 @@ class LitArcEncoder(pl.LightningModule):
         if len(np.unique(y)) > 1:
             score: float = silhouette_score(x, y, metric="cosine")  # type: ignore
             self.log("val_sil_score", score, prog_bar=True)
+            self.best_score = max(self.best_score, score)
         self._eval_embeds.clear()
         self._eval_lbls.clear()
