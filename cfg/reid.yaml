@@ -5,10 +5,10 @@ model:
   model_name: vit_small_patch14_dinov2.lvd142m
   pretrained: true
   im_size: 224
-  arc_s: 32.0
-  arc_m: 0.5
-  lr: 5.0e-05
-  sched_steps: 10000
+  arc_s: 10.0
+  arc_m: 0.296
+  lr: 1.74e-05
+  sched_steps: -1
 data:
   data_dir: data/til23reid
   batch_size: 128

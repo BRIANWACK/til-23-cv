@@ -6,6 +6,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from albumentations.pytorch.transforms import ToTensorV2
+from lightning.pytorch.callbacks import Callback
 
 __all__ = [
     "ReIDEncoder",
@@ -154,3 +155,18 @@ def evaluate_threshold_function(ds, sus_cls, func, x_axis, suspect_dropout, fixe
         f_axis.append(f)
 
     return acc_axis, p_axis, r_axis, f_axis
+
+
+class OptunaCallback(Callback):
+    """Workaround."""
+
+    def __init__(self, trial, monitor):
+        """Initialize."""
+        from optuna.integration import PyTorchLightningPruningCallback
+
+        super(OptunaCallback, self).__init__()
+        self.real = PyTorchLightningPruningCallback(trial, monitor)
+
+    def on_validation_end(self, trainer, pl_module):
+        """Call real."""
+        self.real.on_validation_end(trainer, pl_module)

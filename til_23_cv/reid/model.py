@@ -145,6 +145,8 @@ class LitArcEncoder(pl.LightningModule):
         if len(np.unique(y)) > 1:
             score: float = silhouette_score(x, y, metric="cosine")  # type: ignore
             self.log("val_sil_score", score, prog_bar=True)
+            # For tensorboard.
+            self.log("hp_metric", score)
             self.best_score = max(self.best_score, score)
         self._eval_embeds.clear()
         self._eval_lbls.clear()
