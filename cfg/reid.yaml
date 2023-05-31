@@ -2,22 +2,23 @@
 # NOTE: null values will use defaults. See https://lightning.ai/docs/pytorch/stable/common/trainer.html.
 seed_everything: 42
 model:
-  model_name: vit_small_patch14_dinov2.lvd142m
+  # model_name: vit_small_patch14_dinov2.lvd142m
+  model_name: vit_base_patch14_dinov2.lvd142m
   pretrained: true
   im_size: 224
-  arc_s: 10.0
-  arc_m: 0.296
-  lr: 1.74e-05
-  sched_steps: -1
+  arc_s: 1.4124568291280377
+  arc_m: 0.44747668557158915
+  lr: 2.092551588608895e-05
+  sched_steps: 3104
 data:
   data_dir: data/til23reid
   batch_size: 128
   num_workers: 16
   rgb_mean:
-  - 0.485
-  - 0.456
-  - 0.406
+    - 0.485
+    - 0.456
+    - 0.406
   rgb_std:
-  - 0.229
-  - 0.224
-  - 0.225
+    - 0.229
+    - 0.224
+    - 0.225
