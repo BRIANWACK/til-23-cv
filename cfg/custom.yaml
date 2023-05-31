@@ -7,7 +7,7 @@ mode: train  # YOLO mode, i.e. train, val, predict, export, track, benchmark
 # Train settings -------------------------------------------------------------------------------------------------------
 model:  # path to model file, i.e. yolov8n.pt, yolov8n.yaml
 data:  # path to data file, i.e. coco128.yaml
-epochs: 300  # number of epochs to train for
+epochs: 50  # number of epochs to train for
 patience: 20  # epochs to wait for no observable improvement for early stopping of training
 batch: -1  # number of images per batch (-1 for AutoBatch)
 imgsz: 1280  # size of input images as integer or w,h
@@ -78,7 +78,7 @@ nms: False  # CoreML: add NMS
 
 # Hyperparameters ------------------------------------------------------------------------------------------------------
 lr0: 0.01  # initial learning rate (i.e. SGD=1E-2, Adam=1E-3)
-lrf: 0.003  # final learning rate (lr0 * lrf)
+lrf: 0.02  # final learning rate (lr0 * lrf)
 momentum: 0.937  # SGD momentum/Adam beta1
 weight_decay: 0.0005  # optimizer weight decay 5e-4
 warmup_epochs: 5.0  # warmup epochs (fractions ok)
