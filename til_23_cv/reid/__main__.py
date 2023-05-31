@@ -1,12 +1,14 @@
 """CLI trainer for Suspect Recognition."""
 
 import torch
+import yaml  # type: ignore
 from lightning.pytorch.callbacks import (
     EarlyStopping,
     LearningRateMonitor,
     ModelCheckpoint,
 )
 from lightning.pytorch.cli import LightningArgumentParser, LightningCLI
+from lightning.pytorch.plugins import MixedPrecisionPlugin
 
 from .data import LitImClsDataModule
 from .model import LitArcEncoder
@@ -24,7 +26,7 @@ TRAINER_DEFAULTS = lambda: dict(
     # https://lightning.ai/docs/pytorch/stable/extensions/callbacks.html
     callbacks=[
         LearningRateMonitor(logging_interval="step"),
-        EarlyStopping(monitor="val_sil_score", patience=10, mode="max"),
+        EarlyStopping(monitor="val_sil_score", patience=16, mode="max"),
         ModelCheckpoint(
             monitor="val_sil_score",
             mode="max",
@@ -38,9 +40,9 @@ TRAINER_DEFAULTS = lambda: dict(
     check_val_every_n_epoch=1,
     # Performance options.
     deterministic=False,
+    # deterministic=True,
     benchmark=True,
-    # Glitchy, see https://github.com/Lightning-AI/lightning/issues/5558.
-    # precision="16-mixed",
+    plugins=[MixedPrecisionPlugin("16-mixed", device="cuda")],
     # Useful for debugging.
     # fast_dev_run=True,
     # detect_anomaly=True,
@@ -63,11 +65,15 @@ class MyLightningCLI(LightningCLI):
             # torch.set_float32_matmul_precision("high")
 
 
-def cli_main(args=None):
+def cli_main(args=None, config=None):
     """CLI Entrypoint.
 
     See https://lightning.ai/docs/pytorch/stable/cli/lightning_cli_advanced_3.html#run-from-python.
     """
+    if config is not None:
+        assert args is None
+        with open(config) as f:
+            args = yaml.safe_load(f)
     run = args is None
     cli = MyLightningCLI(
         LitArcEncoder,
