@@ -1,4 +1,4 @@
-ultralytics@git+https://github.com/Interpause/ultralytics.git@6b39102c366cac5f13139c0d93dd6b8b4c4829a3
+ultralytics@git+https://github.com/Interpause/ultralytics.git@607d1b6a18701a3b41042c52784fbb6e1db02a5f
 timm
 lightning
 jsonargparse[signatures]
