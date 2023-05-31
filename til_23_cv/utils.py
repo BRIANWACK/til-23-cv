@@ -49,6 +49,7 @@ class ReIDEncoder(nn.Module):
         self.device = device
         self.to(device)
 
+    @torch.inference_mode()
     def forward(self, ims: np.ndarray) -> torch.Tensor:
         """Forward pass."""
         x = torch.stack([self.normalize(image=im)["image"] for im in ims])
