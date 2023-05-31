@@ -10,9 +10,6 @@
   - Model download: <https://github.com/ultralytics/assets/releases/tag/v0.0.0>.
   - Model is auto-downloaded by `ultralytics`, no explicit download required.
   - `yolov5m6u.pt` was chosen based on vram limitations and effective batch size.
-- Model training was stopped early at epoch 84, and `best.pt` was renamed to `custom_yolov5m6u_best.pt`.
-  - NOTE: Config file specifies 300 epochs to preserve original lr curve used. `Ctrl+C` recommended to interrupt training early.
-  - See <https://github.com/ultralytics/ultralytics/blob/dada5b7/ultralytics/yolo/utils/metrics.py#L657-L660> for definition of best model.
 - For modifications made to [`ultralytics`](https://github.com/ultralytics/ultralytics), see <https://github.com/Interpause/ultralytics/compare/f23a035...main>.
   - Notably, `ultralytics` hardcodes [Albumentations](https://albumentations.ai/).
   - I wasn't going to wait for a PR so I just modified their hardcoded stuff.
@@ -23,6 +20,7 @@
   - Model download: <https://huggingface.co/timm/vit_small_patch14_dinov2.lvd142m>.
   - Model is auto-downloaded by `timm`, no explicit download required.
   - DINOv2 (ViT-S/14) chosen for similar size to ResNet50 and State of the Art Object-Centric Representations via Self-Supervised Learning.
+    - Update: DINOv2 ViT-B/14 was used instead. Download from: <https://huggingface.co/timm/vit_base_patch14_dinov2.lvd142m>.
 - ArcFace loss was used to reshape model's latent space into a hypersphere for cosine similarity: <https://arxiv.org/abs/1801.07698>.
 - `sklearn` [Silhouette Score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.silhouette_score.html) was used for cluster evaluation.
 - Training code is custom based on [PyTorch Lightning](https://www.pytorchlightning.ai/).
@@ -30,6 +28,7 @@
 
 ### Others
 
+- If coming here from Colab, ignore all subsequent instructions as they are already included in the notebook.
 - For the competition platform, `%%sh ./setup.sh` is included in the notebooks
   - Remember to regularly "Write changes to dataset"!
   - `./data` is symlinked to the "data" dataset to store datasets.
