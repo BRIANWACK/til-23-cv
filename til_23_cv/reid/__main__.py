@@ -30,8 +30,10 @@ TRAINER_DEFAULTS = lambda: dict(
         ModelCheckpoint(
             monitor="val_sil_score",
             mode="max",
-            save_top_k=2,
-            save_last=True,
+            save_top_k=1,
+            # save_last=True,
+            save_last=False,
+            save_weights_only=True,
             filename="{epoch}-{val_sil_score:.3f}",
         ),
     ],
