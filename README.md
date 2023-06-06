@@ -23,7 +23,7 @@
     - Update: DINOv2 ViT-B/14 was used instead. Download from: <https://huggingface.co/timm/vit_base_patch14_dinov2.lvd142m>.
 - ArcFace loss was used to reshape model's latent space into a hypersphere for cosine similarity: <https://arxiv.org/abs/1801.07698>.
 - `sklearn` [Silhouette Score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.silhouette_score.html) was used for cluster evaluation.
-- Training code is custom based on [PyTorch Lightning](https://www.pytorchlightning.ai/).
+- Training code for Suspect Recognition is custom based on [PyTorch Lightning](https://www.pytorchlightning.ai/).
   - Especially [Lightning CLI](https://lightning.ai/docs/pytorch/stable/cli/lightning_cli.html).
 
 ### Others
