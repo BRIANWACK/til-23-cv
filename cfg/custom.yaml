@@ -7,15 +7,15 @@ mode: train  # YOLO mode, i.e. train, val, predict, export, track, benchmark
 # Train settings -------------------------------------------------------------------------------------------------------
 model:  # path to model file, i.e. yolov8n.pt, yolov8n.yaml
 data:  # path to data file, i.e. coco128.yaml
-epochs: 40  # number of epochs to train for
-patience: 16  # epochs to wait for no observable improvement for early stopping of training
+epochs: 150  # number of epochs to train for
+patience: 20  # epochs to wait for no observable improvement for early stopping of training
 batch: -1  # number of images per batch (-1 for AutoBatch)
 imgsz: 1280  # size of input images as integer or w,h
 save: True  # save train checkpoints and predict results
-save_period: 1 # Save checkpoint every x epochs (disabled if < 1)
+save_period: -1 # Save checkpoint every x epochs (disabled if < 1)
 cache: False  # True/ram, disk or False. Use cache for data loading
 device: cuda:0  # device to run on, i.e. cuda device=0 or device=0,1,2,3 or device=cpu
-workers: 6  # number of worker threads for data loading (per RANK if DDP)
+workers: 24  # number of worker threads for data loading (per RANK if DDP)
 project:  # project name
 name: custom/unnamed  # experiment name, results saved to 'project/name' directory
 exist_ok: False  # whether to overwrite existing experiment
@@ -78,10 +78,10 @@ nms: False  # CoreML: add NMS
 
 # Hyperparameters ------------------------------------------------------------------------------------------------------
 lr0: 0.01  # initial learning rate (i.e. SGD=1E-2, Adam=1E-3)
-lrf: 0.01  # final learning rate (lr0 * lrf)
+lrf: 0.001  # final learning rate (lr0 * lrf)
 momentum: 0.937  # SGD momentum/Adam beta1
 weight_decay: 0.0005  # optimizer weight decay 5e-4
-warmup_epochs: 5.0  # warmup epochs (fractions ok)
+warmup_epochs: 10.0  # warmup epochs (fractions ok)
 warmup_momentum: 0.8  # warmup initial momentum
 warmup_bias_lr: 0.1  # warmup initial bias lr
 box: 7.5  # box loss gain
@@ -91,13 +91,13 @@ pose: 12.0  # pose loss gain
 kobj: 1.0  # keypoint obj loss gain
 label_smoothing: 0.0  # label smoothing (fraction)
 nbs: 64  # nominal batch size
-hsv_h: 0.015  # image HSV-Hue augmentation (fraction)
-hsv_s: 0.7  # image HSV-Saturation augmentation (fraction)
-hsv_v: 0.5  # image HSV-Value augmentation (fraction)
-degrees: 15.0  # image rotation (+/- deg)
+hsv_h: 0.02  # image HSV-Hue augmentation (fraction)
+hsv_s: 0.8  # image HSV-Saturation augmentation (fraction)
+hsv_v: 0.6  # image HSV-Value augmentation (fraction)
+degrees: 20.0  # image rotation (+/- deg)
 translate: 0.3  # image translation (+/- fraction)
-scale: 0.4  # image scale (+/- gain)
-shear: 4.0  # image shear (+/- deg)
+scale: 0.5  # image scale (+/- gain)
+shear: 5.0  # image shear (+/- deg)
 perspective: 0.0  # image perspective (+/- fraction), range 0-0.001
 flipud: 0.0  # image flip up-down (probability)
 fliplr: 0.5  # image flip left-right (probability)
