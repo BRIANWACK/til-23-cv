@@ -144,12 +144,14 @@ class LitImClsDataModule(pl.LightningDataModule):
     def train_dataloader(self):
         """Train dataloader."""
         assert self.train_ds is not None
-        return DataLoader(self.train_ds, shuffle=True, **self.loader_cfg)
+        return DataLoader(
+            self.train_ds, shuffle=True, drop_last=True, **self.loader_cfg
+        )
 
     def val_dataloader(self):
         """Validation dataloader."""
         assert self.val_ds is not None
-        return DataLoader(self.val_ds, shuffle=False, **self.loader_cfg)
+        return DataLoader(self.val_ds, shuffle=False, drop_last=True, **self.loader_cfg)
 
     def test_dataloader(self):
         """Test dataloader."""
