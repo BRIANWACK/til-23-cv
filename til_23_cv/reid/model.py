@@ -10,7 +10,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from sklearn.metrics import silhouette_score
-from torch.optim import Adam
+from timm.optim import MADGRAD
 from torch.optim.lr_scheduler import OneCycleLR
 
 from .arcface import ArcMarginProduct
@@ -30,6 +30,8 @@ class LitArcEncoder(pl.LightningModule):
         arc_s: float = 32.0,
         arc_m: float = 0.5,
         lr: float = 5e-5,
+        momentum: float = 0.9,
+        decay: float = 0.0,
         sched_steps: int = -1,
     ):
         """Initialize LitArcEncoder.
@@ -42,6 +44,8 @@ class LitArcEncoder(pl.LightningModule):
             arc_s (float, optional): ArcFace logit scaling factor. Defaults to 32.0.
             arc_m (float, optional): ArcFace angular margin. Defaults to 0.5.
             lr (float, optional): Max learning rate. Defaults to 5e-5.
+            momentum (float, optional): Optimizer momentum. Defaults to 0.9.
+            decay (float, optional): Optimizer weight decay. Defaults to 0.0.
             sched_steps (int, optional): Number of steps for OneCycleLR. Defaults to -1.
         """
         super(LitArcEncoder, self).__init__()
@@ -49,6 +53,8 @@ class LitArcEncoder(pl.LightningModule):
 
         self.nclasses = nclasses
         self.lr = lr
+        self.momentum = momentum
+        self.decay = decay
         self.sched_steps = sched_steps
         self.best_score = -1.0
 
@@ -109,7 +115,7 @@ class LitArcEncoder(pl.LightningModule):
         """Configure optimizers."""
         # See https://github.com/Lightning-AI/lightning/issues/3095 on how to
         # change optimizer/scheduler midtraining for multi-stage finetune.
-        optimizer = Adam(self.parameters(), lr=self.lr)
+        optimizer = MADGRAD(self.parameters(), self.lr, self.momentum, self.decay)
         if self.sched_steps == -1:
             return optimizer
         scheduler = OneCycleLR(optimizer, self.lr, total_steps=self.sched_steps)
