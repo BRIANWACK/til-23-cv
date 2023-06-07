@@ -26,7 +26,7 @@ TRAINER_DEFAULTS = lambda: dict(
     # https://lightning.ai/docs/pytorch/stable/extensions/callbacks.html
     callbacks=[
         LearningRateMonitor(logging_interval="step"),
-        EarlyStopping(monitor="val_sil_score", patience=16, mode="max"),
+        EarlyStopping(monitor="val_sil_score", patience=20, mode="max"),
         ModelCheckpoint(
             monitor="val_sil_score",
             mode="max",

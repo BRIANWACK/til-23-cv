@@ -1,6 +1,6 @@
 """Suspect Recognition model."""
 
-from typing import List, Tuple
+from typing import List, Mapping, Tuple
 
 import lightning.pytorch as pl
 import numpy as np
@@ -9,13 +9,14 @@ import timm.data
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from lightning.pytorch.callbacks import BaseFinetuning
 from sklearn.metrics import silhouette_score
 from timm.optim import MADGRAD
 from torch.optim.lr_scheduler import OneCycleLR
 
 from .arcface import ArcMarginProduct
 
-__all__ = ["LitArcEncoder"]
+__all__ = ["LitArcEncoder", "UnfreezeCallback"]
 
 
 class LitArcEncoder(pl.LightningModule):
@@ -67,6 +68,7 @@ class LitArcEncoder(pl.LightningModule):
             global_pool="token",  # Use cls token.
             # NOTE: timm only supports pos encoding interpolation at init.
             img_size=im_size,
+            scriptable=True,
         )
         self.head = ArcMarginProduct(
             self.model.num_features, nclasses, s=arc_s, m=arc_m
@@ -156,3 +158,29 @@ class LitArcEncoder(pl.LightningModule):
             self.best_score = max(self.best_score, score)
         self._eval_embeds.clear()
         self._eval_lbls.clear()
+
+
+class UnfreezeCallback(BaseFinetuning):
+    """Callback to freeze all layers at start and unfreeze during training."""
+
+    def __init__(self, milestones: Mapping[int, List[int]]):
+        """Initialize UnfreezeCallback.
+
+        Args:
+            milestones (Mapping[int, Union[int, List[int]]]): Mapping from epoch to layer indices to unfreeze.
+        """
+        super(UnfreezeCallback, self).__init__()
+        self.milestones = milestones
+
+    def freeze_before_training(self, pl_module):
+        """Freeze layers before training."""
+        excluded = [pl_module.model.blocks[i] for i in self.milestones.get(0, [])]
+        self.freeze([l for l in pl_module.model.blocks if l not in excluded])
+
+    def finetune_function(self, pl_module, epoch: int, optimizer):
+        """Unfreeze layers during training."""
+        if epoch == 0:
+            return
+        if epoch in self.milestones:
+            layers = [pl_module.model.blocks[i] for i in self.milestones[epoch]]
+            self.unfreeze_and_add_param_group(layers, optimizer)
