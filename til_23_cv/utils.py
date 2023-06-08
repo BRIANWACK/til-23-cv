@@ -30,11 +30,11 @@ IM_SIZE = 224
 class ReIDEncoder(nn.Module):
     """Convenience class for ReID encoder."""
 
-    # TODO: Debug torchscript not working when device is different.
     def __init__(self, model_path: str, device="cpu"):
         """Initialize ReIDEncoder."""
         super(ReIDEncoder, self).__init__()
         traced = torch.jit.load(model_path)
+        traced.to(device).eval()
         self.encoder = torch.jit.optimize_for_inference(traced)
         self.normalize = A.Compose(
             [

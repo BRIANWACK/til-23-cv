@@ -40,6 +40,7 @@ TRAINER_DEFAULTS = lambda: dict(
     default_root_dir="runs",
     log_every_n_steps=1,
     check_val_every_n_epoch=1,
+    num_sanity_val_steps=0,
     # Performance options.
     deterministic=False,
     # deterministic=True,

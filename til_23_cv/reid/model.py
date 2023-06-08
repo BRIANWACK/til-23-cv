@@ -12,6 +12,7 @@ import torch.nn.functional as F
 from lightning.pytorch.callbacks import BaseFinetuning
 from sklearn.metrics import silhouette_score
 from timm.optim import MADGRAD
+from torch.optim import SGD, AdamW
 from torch.optim.lr_scheduler import OneCycleLR
 
 from .arcface import ArcMarginProduct
@@ -33,6 +34,7 @@ class LitArcEncoder(pl.LightningModule):
         lr: float = 5e-5,
         momentum: float = 0.9,
         decay: float = 0.0,
+        optim: str = "adamw",
         sched_steps: int = -1,
     ):
         """Initialize LitArcEncoder.
@@ -47,6 +49,7 @@ class LitArcEncoder(pl.LightningModule):
             lr (float, optional): Max learning rate. Defaults to 5e-5.
             momentum (float, optional): Optimizer momentum. Defaults to 0.9.
             decay (float, optional): Optimizer weight decay. Defaults to 0.0.
+            optim (str, optional): Either "sgd", "sgdn", "adamw" or "madgrad". Defaults to "adamw".
             sched_steps (int, optional): Number of steps for OneCycleLR. Defaults to -1.
         """
         super(LitArcEncoder, self).__init__()
@@ -56,6 +59,7 @@ class LitArcEncoder(pl.LightningModule):
         self.lr = lr
         self.momentum = momentum
         self.decay = decay
+        self.optim = optim
         self.sched_steps = sched_steps
         self.best_score = -1.0
 
@@ -117,7 +121,20 @@ class LitArcEncoder(pl.LightningModule):
         """Configure optimizers."""
         # See https://github.com/Lightning-AI/lightning/issues/3095 on how to
         # change optimizer/scheduler midtraining for multi-stage finetune.
-        optimizer = MADGRAD(self.parameters(), self.lr, self.momentum, self.decay)
+        if self.optim in ("sgd", "sgdn"):
+            optimizer = SGD(
+                self.parameters(),
+                self.lr,
+                momentum=self.momentum,
+                weight_decay=self.decay,
+                nesterov=self.optim == "sgdn",
+            )
+        elif self.optim == "adamw":
+            optimizer = AdamW(self.parameters(), self.lr, weight_decay=self.decay)
+        elif self.optim == "madgrad":
+            optimizer = MADGRAD(self.parameters(), self.lr, self.momentum, self.decay)
+        else:
+            raise f"Unsupported optimizer: {self.optim}"
         if self.sched_steps == -1:
             return optimizer
         scheduler = OneCycleLR(optimizer, self.lr, total_steps=self.sched_steps)
