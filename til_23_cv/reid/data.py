@@ -36,16 +36,16 @@ DEFAULT_TRANSFORMS = [
         interpolation=cv2.INTER_CUBIC,
     ),
     A.Flip(p=0.7),
-    A.ColorJitter(p=0.7, brightness=0.6, contrast=0.2, saturation=0.8, hue=0.05),
+    A.ColorJitter(p=0.7, brightness=0.4, contrast=0.2, saturation=0.6, hue=0.005),
     A.AdvancedBlur(
         p=0.1, blur_limit=(7, 15), noise_limit=(0.0, 2.0), beta_limit=(0.0, 4.0)
     ),
     A.MotionBlur(p=0.1, blur_limit=(7, 15)),
-    A.ToGray(p=0.3),
+    A.ToGray(p=0.2),
     A.ImageCompression(p=0.1, quality_lower=20, quality_upper=50),
     A.CLAHE(p=0.1),
-    A.GaussNoise(p=0.2, per_channel=True, var_limit=(1000.0, 5000.0)),
-    A.ISONoise(p=0.2, intensity=(0.1, 0.5), color_shift=(0.03, 0.06)),
+    A.GaussNoise(p=0.15, per_channel=True, var_limit=(1000.0, 5000.0)),
+    A.ISONoise(p=0.15, intensity=(0.1, 0.5), color_shift=(0.03, 0.06)),
 ]
 
 
@@ -151,7 +151,7 @@ class LitImClsDataModule(pl.LightningDataModule):
     def val_dataloader(self):
         """Validation dataloader."""
         assert self.val_ds is not None
-        return DataLoader(self.val_ds, shuffle=False, drop_last=True, **self.loader_cfg)
+        return DataLoader(self.val_ds, shuffle=True, drop_last=True, **self.loader_cfg)
 
     def test_dataloader(self):
         """Test dataloader."""
